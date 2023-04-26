@@ -5,8 +5,7 @@ import {IframePlugin} from '@remixproject/engine-web'
 const _paq = (window._paq = window._paq || [])
 
 // requiredModule removes the plugin from the plugin manager list on UI
-const requiredModules = [
-  // services + layout views + system views
+const requiredModules = [ // services + layout views + system views
   'manager',
   'config',
   'compilerArtefacts',
@@ -71,8 +70,8 @@ const requiredModules = [
   'codeFormatter',
   'solidityumlgen',
   'contractflattener',
-  'solidity-script'
-]
+  'solidity-script',
+  'home']
 
 // dependentModules shouldn't be manually activated (e.g hardhat is activated by remixd)
 const dependentModules = ['foundry', 'hardhat', 'truffle', 'slither']
