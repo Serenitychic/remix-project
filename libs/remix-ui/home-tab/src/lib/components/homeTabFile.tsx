@@ -239,8 +239,8 @@ function HomeTabFile({plugin}: HomeTabFileProps) {
         <label style={{fontSize: "1.2rem"}}><FormattedMessage id='home.files' /></label>
         <div className="d-flex flex-column">
           <div className='d-flex flex-row'>
-            <button className="btn btn-primary p-2 mr-2 border my-1" data-id="homeTabStartCoding" style={{width: 'fit-content'}} onClick={() => startCoding()}><FormattedMessage id='home.startCoding' /></button>
-            <label className="btn p-2 mr-2 border my-1" style={{width: 'fit-content', cursor: 'pointer'}} htmlFor="openFileInput"><FormattedMessage id='home.openFile' /></label>
+            <button className="btn btn-primary text-nowrap p-2 mr-2 border my-1" data-id="homeTabStartCoding" style={{width: 'fit-content'}} onClick={() => startCoding()}><FormattedMessage id='home.startCoding' /></button>
+            <label className="btn text-nowrap p-2 mr-2 border my-1" style={{width: 'fit-content', cursor: 'pointer'}} htmlFor="openFileInput"><FormattedMessage id='home.openFile' /></label>
             <input title="open file" type="file" id="openFileInput" onChange={(event) => {
               event.stopPropagation()
               plugin.verticalIcons.select('filePanel')
@@ -253,7 +253,7 @@ function HomeTabFile({plugin}: HomeTabFileProps) {
               tooltipText={"Connect to Localhost"}
               tooltipTextClasses="border bg-light text-dark p-1 pr-3"
             >
-              <button className="btn p-2 border my-1" style={{width: 'fit-content'}} onClick={() => connectToLocalhost()}><FormattedMessage id='home.connectToLocalhost' /></button>
+              <button className="btn text-nowrap p-2 border my-1" style={{width: 'fit-content'}} onClick={() => connectToLocalhost()}><FormattedMessage id='home.connectToLocalhost' /></button>
             </CustomTooltip>
           </div>
           { !(state.recentWorkspaces.first == '' &&
