@@ -115,21 +115,22 @@ function HomeTabFile({plugin}: HomeTabFileProps) {
     _paq.push(['trackEvent', 'hometab', 'filesSection', 'startCoding'])
     plugin.verticalIcons.select('filePanel')
 
-    const wName = 'Coding playground'
+    const wName = 'Playground'
     const workspaces = await plugin.call('filePanel', 'getWorkspaces')
     if (!workspaces.find(workspace => workspace.name === wName)) {
       await plugin.call('filePanel', 'createWorkspace', wName, 'remixDefault')
+      await plugin.call('filePanel', 'setWorkspace', wName)
+    } else {
+      await plugin.call('filePanel', 'switchToWorkspace', { name: wName, isLocalHost: false })
     }
-    await plugin.call('filePanel', 'switchToWorkspace', { name: wName, isLocalHost: false })
-    await plugin.call('filePanel', 'switchToWorkspace', { name: wName, isLocalHost: false }) // don't ask why
 
-    const content = `
-  // SPDX-License-Identifier: MIT
-  pragma solidity >=0.7.0 <0.9.0;
+    const content = `// SPDX-License-Identifier: MIT
+pragma solidity >=0.7.0 <0.9.0;
 
-  contract helloWorld {
-  }
-  `
+contract helloWorld {
+}
+`
+
     const {newContent, newPath} = await plugin.call('fileManager', 'writeFileNoRewrite', '/contracts/helloWorld.sol', content)
     await plugin.call('fileManager', 'open', newPath)
   }
@@ -174,11 +175,15 @@ function HomeTabFile({plugin}: HomeTabFileProps) {
   const handleSwichToRecentWorkspace = async (e, workspaceName) => {
     e.preventDefault();
 <<<<<<< HEAD
+<<<<<<< HEAD
     await plugin.call('filePanel', 'switchToWorkspace', { name: workspaceName, isLocalhost: false })
     console.log('The link was clicked.');
 =======
       await plugin.call('filePanel', 'switchToWorkspace', { name: workspaceName, isLocalhost: false })
 >>>>>>> e9b2848c5... cleanup fix undefined workspaces. Creating default  Workspace
+=======
+    await plugin.call('filePanel', 'switchToWorkspace', { name: workspaceName, isLocalhost: false })
+>>>>>>> 06483cab7... fix vreating workspace
   }
 
   const examples = state.modalInfo.examples.map((urlEl, key) => (
@@ -208,26 +213,15 @@ function HomeTabFile({plugin}: HomeTabFileProps) {
             {state.modalInfo.prefix && <span className="text-nowrap align-self-center mr-2">ipfs://</span>}
             <input
               ref={inputValue}
-<<<<<<< HEAD
               type="text"
               name="prompt_text"
               id="inputPrompt_text"
-=======
-              type='text'
-              name='prompt_text'
-              id='inputPrompt_text'
->>>>>>> e9b2848c5... cleanup fix undefined workspaces. Creating default  Workspace
               className="w-100 mt-1 form-control"
               data-id="homeTabModalDialogCustomPromptText"
               value={state.importSource}
               onInput={(e) => {
-<<<<<<< HEAD
                 setState((prevState) => {
                   return {...prevState, importSource: inputValue.current.value}
-=======
-                setState(prevState => {
-                  return { ...prevState, importSource: inputValue.current.value }
->>>>>>> e9b2848c5... cleanup fix undefined workspaces. Creating default  Workspace
                 })
               }}
             />
