@@ -153,6 +153,7 @@ export const EditorUI = (props: EditorUIProps) => {
   const pasteCodeRef = useRef(false)
   const editorRef = useRef(null)
   const monacoRef = useRef<Monaco>(null)
+  const currentFunction = useRef('')
   const currentFileRef = useRef('')
   const currentUrlRef = useRef('')
   // const currentDecorations = useRef({ sourceAnnotationsPerFile: {}, markerPerFile: {} }) // decorations that are currently in use by the editor
@@ -687,7 +688,43 @@ export const EditorUI = (props: EditorUIProps) => {
       }
     }
 
-    const freeFunctionCondition = editor.createContextKey('freeFunctionCondition', false)
+    let gptGenerateDocumentationAction
+    const executeGptGenerateDocumentationAction = {
+      id: "generateDocumentation",
+      label: "Generate documentation for this function",
+      contextMenuOrder: 0, // choose the order
+      contextMenuGroupId: "gtp", // create a new grouping
+      keybindings: [],
+      run: async () => {
+        const file = await props.plugin.call('fileManager', 'getCurrentFile')
+        const content = await props.plugin.call('fileManager', 'readFile', file)
+        const message = `
+        solidity code: ${content}
+        Generate the documentation for the function ${currentFunction.current} using the Doxygen style syntax
+        `
+        await props.plugin.call('openaigpt', 'message', message)
+      },
+    }
+
+    let gptExplainFunctionAction
+    const executegptExplainFunctionAction = {
+      id: "generateDocumentation",
+      label: "Explain this function",
+      contextMenuOrder: 0, // choose the order
+      contextMenuGroupId: "gtp", // create a new grouping
+      keybindings: [],
+      run: async () => {
+        const file = await props.plugin.call('fileManager', 'getCurrentFile')
+        const content = await props.plugin.call('fileManager', 'readFile', file)
+        const message = `
+        solidity code: ${content}
+        Explain the function ${currentFunction.current}
+        `
+        await props.plugin.call('openaigpt', 'message', message)
+      },
+    }
+
+    const freeFunctionCondition = editor.createContextKey('freeFunctionCondition', false);
     let freeFunctionAction
     const executeFreeFunctionAction = {
       id: 'executeFreeFunction',
@@ -699,7 +736,7 @@ export const EditorUI = (props: EditorUIProps) => {
         // eslint-disable-next-line no-bitwise
         monacoRef.current.KeyMod.Shift | monacoRef.current.KeyMod.Alt | monacoRef.current.KeyCode.KeyR
       ],
-      run: async () => {
+      run: async () => { 
         const {nodesAtPosition} = await retrieveNodesAtPosition(props.editorAPI, props.plugin)
         // find the contract and get the nodes of the contract and the base contracts and imports
         if (nodesAtPosition && isArray(nodesAtPosition) && nodesAtPosition.length) {
@@ -719,6 +756,8 @@ export const EditorUI = (props: EditorUIProps) => {
     editor.addAction(zoomOutAction)
     editor.addAction(zoominAction)
     freeFunctionAction = editor.addAction(executeFreeFunctionAction)
+    gptGenerateDocumentationAction = editor.addAction(executeGptGenerateDocumentationAction)
+    gptExplainFunctionAction = editor.addAction(executegptExplainFunctionAction)
 
     // we have to add the command because the menu action isn't always available (see onContextMenuHandlerForFreeFunction)
     editor.addCommand(monacoRef.current.KeyMod.Shift | monacoRef.current.KeyMod.Alt | monacoRef.current.KeyCode.KeyR, () => executeFreeFunctionAction.run())
@@ -730,6 +769,15 @@ export const EditorUI = (props: EditorUIProps) => {
         freeFunctionAction.dispose()
         freeFunctionAction = null
       }
+      if (gptGenerateDocumentationAction) {
+        gptGenerateDocumentationAction.dispose()
+        gptGenerateDocumentationAction = null
+      }
+      if (gptExplainFunctionAction) {
+        gptExplainFunctionAction.dispose()
+        gptExplainFunctionAction = null
+      }
+
       const file = await props.plugin.call('fileManager', 'getCurrentFile')
       if (!file.endsWith('.sol')) {
         freeFunctionCondition.set(false)
@@ -740,6 +788,14 @@ export const EditorUI = (props: EditorUIProps) => {
       if (freeFunctionNode) {
         executeFreeFunctionAction.label = `Run the free function "${freeFunctionNode.name}" in the Remix VM`
         freeFunctionAction = editor.addAction(executeFreeFunctionAction)
+      }
+      const functionImpl = nodesAtPosition.find((node) => node.kind === 'function')      
+      if (functionImpl) {
+        currentFunction.current = functionImpl.name
+        executeGptGenerateDocumentationAction.label = `Generate documentation for the function "${functionImpl.name}"`
+        gptGenerateDocumentationAction = editor.addAction(executeGptGenerateDocumentationAction)
+        executegptExplainFunctionAction.label = `Explain the function "${functionImpl.name}"`
+        gptExplainFunctionAction = editor.addAction(executegptExplainFunctionAction)
       }
       freeFunctionCondition.set(!!freeFunctionNode)
     }
